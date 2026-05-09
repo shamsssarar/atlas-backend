@@ -4,6 +4,7 @@ import { WorkoutRoutes } from "../modules/workout/workout.route";
 import { ProgramRoutes } from "../modules/program/program.route";
 import path from "path";
 import { ProgramDayRoutes } from "../modules/programDay/programDay.route";
+import { ExerciseRoutes } from "../modules/exercise/exercise.route";
 
 const router = express.Router();
 
@@ -24,6 +25,10 @@ const moduleRoutes = [
   {
     path: "/programDays",
     route: ProgramDayRoutes,
+  },
+  {
+    path: "/exercises",
+    route: ExerciseRoutes,
   },
 ];
 
