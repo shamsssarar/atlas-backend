@@ -13,4 +13,11 @@ router.post(
   RagChatbotController.askCoach,
 );
 
+router.post(
+  "/knowledge",
+  requireAuth,
+  authRole("COACH"),
+  RagChatbotController.addCoachKnowledge,
+);
+
 export const RagChatbotRoutes = router;
