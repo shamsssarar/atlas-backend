@@ -9,20 +9,21 @@ datasource db {
 }
 
 model User {
-  id               String       @id // Maps directly to Firebase Auth UID
-  email            String       @unique
-  role             Role         @default(ATHLETE)
+  id               String          @id // Maps directly to Firebase Auth UID
+  email            String          @unique
+  role             Role            @default(ATHLETE)
   profile          Profile?
   athleteDetails   AthleteDetails?
   coachDetails     CoachDetails?
   coachId          String?
-  coach            User?        @relation("CoachToAthlete", fields: [coachId], references: [id], onDelete: SetNull)
-  athletes         User[]       @relation("CoachToAthlete")
+  coach            User?           @relation("CoachToAthlete", fields: [coachId], references: [id], onDelete: SetNull)
+  athletes         User[]          @relation("CoachToAthlete")
   workouts         Workout[]
   biometrics       Biometrics[]
   insights         AIInsight[]
-  createdPrograms  Program[]    @relation("CoachPrograms")
-  assignedPrograms Program[]    @relation("AthletePrograms")
+  createdPrograms  Program[]       @relation("CoachPrograms")
+  assignedPrograms Program[]       @relation("AthletePrograms")
+  customExercises  Exercise[]      @relation("CoachCustomExercises")
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

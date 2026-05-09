@@ -1,10 +1,17 @@
 model Exercise {
-  id               String            @id @default(uuid())
-  name             String            @unique // e.g., "Barbell Back Squat"
+  id               String  @id @default(uuid())
+  name             String  @unique // e.g., "Barbell Back Squat"
   targetMuscle     String // e.g., "Quadriceps"
   biomechanicsType String? // e.g., "Compound", "Isolation"
   description      String?
   videoUrl         String?
+
+  muscleGroup MuscleGroup
+  equipment   Equipment
+
+  coachId String?
+  coach   User?   @relation("CoachCustomExercises", fields: [coachId], references: [id], onDelete: Cascade)
+
   workoutExercises WorkoutExercise[]
   exerciseTargets  ExerciseTarget[]
 

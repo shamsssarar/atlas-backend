@@ -1,9 +1,9 @@
 model Program {
-  id            String  @id @default(uuid())
+  id            String          @id @default(uuid())
   name          String
   description   String?
   durationWeeks Int
-  category ProgramCategory @default(STRENGTH_TRAINING)
+  category      ProgramCategory @default(STRENGTH_TRAINING)
 
   coachId String
   coach   User   @relation("CoachPrograms", fields: [coachId], references: [id], onDelete: Cascade)

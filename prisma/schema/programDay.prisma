@@ -4,10 +4,13 @@ model ProgramDay {
   program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
   dayNumber Int // e.g., 1, 2, 3 representing Day 1, Day 2, etc.
 
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  deletedAt      DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  workouts       Workout[]
   ExerciseTarget ExerciseTarget[]
 
+  @@unique([programId, dayNumber])
   @@index([programId])
 }
