@@ -15,5 +15,6 @@ model Biometrics {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
+  @@unique([athleteId, date])
   @@index([athleteId])
 }
