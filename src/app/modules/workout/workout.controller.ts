@@ -39,6 +39,29 @@ const logSet = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const addExerciseToLiveWorkout = catchAsync(
+  async (req: Request, res: Response) => {
+    if (!req.user || !req.user.uid) {
+      throw new AppError(401, "Unauthorized");
+    }
+
+    const athleteId = req.user.uid;
+    const { workoutId } = req.params;
+    const result = await WorkoutService.addExerciseToLiveWorkout(
+      athleteId,
+      workoutId as string,
+      req.body,
+    );
+
+    sendResponse(res, {
+      statusCode: 201,
+      success: true,
+      message: "Exercise added to live workout successfully",
+      data: result,
+    });
+  },
+);
+
 const getWorkoutSummary = catchAsync(async (req: Request, res: Response) => {
   if (!req.user || !req.user.uid) {
     throw new AppError(401, "Unauthorized");
@@ -62,4 +85,5 @@ export const WorkoutController = {
   startWorkout,
   logSet,
   getWorkoutSummary,
+  addExerciseToLiveWorkout,
 };

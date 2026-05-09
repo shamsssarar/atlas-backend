@@ -16,6 +16,11 @@ interface LogSetPayload {
   notes?: string;
 }
 
+interface AddExercisePayload {
+  exerciseId: string;
+  order?: number;
+}
+
 const startWorkout = async (
   athleteId: string,
   payload: StartWorkoutPayload,
@@ -114,8 +119,54 @@ const getWorkoutSummary = async (
   return workout;
 };
 
+const addExerciseToLiveWorkout = async (
+  athleteId: string,
+  workoutId: string,
+  payload: AddExercisePayload,
+): Promise<any> => {
+  // Returns WorkoutExercise with nested Exercise data
+  // 1. Zero Trust: Verify workout exists and belongs to this athlete
+  const workout = await prisma.workout.findUnique({
+    where: { id: workoutId },
+    include: { workoutExercises: true },
+  });
+
+  if (!workout || workout.deletedAt) {
+    throw new AppError(404, "Workout not found");
+  }
+
+  if (workout.athleteId !== athleteId) {
+    throw new AppError(403, "Forbidden: You do not own this workout");
+  }
+
+  // 2. Verify the requested Exercise actually exists in the global dictionary
+  const exercise = await prisma.exercise.findUnique({
+    where: { id: payload.exerciseId },
+  });
+
+  if (!exercise || exercise.deletedAt) {
+    throw new AppError(404, "Exercise not found");
+  }
+
+  // 3. Pro-Move: Auto-calculate the order if the frontend didn't provide it
+  const nextOrder = payload.order ?? workout.workoutExercises.length + 1;
+
+  // 4. Create the bridge record
+  return await prisma.workoutExercise.create({
+    data: {
+      workoutId,
+      exerciseId: payload.exerciseId,
+      order: nextOrder,
+    },
+    include: {
+      exercise: true, // Return the exercise details so the UI can render "Barbell Squat"
+    },
+  });
+};
+
 export const WorkoutService = {
   startWorkout,
   logSet,
   getWorkoutSummary,
+  addExerciseToLiveWorkout,
 };

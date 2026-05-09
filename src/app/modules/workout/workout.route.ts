@@ -16,6 +16,14 @@ router.post(
   WorkoutController.startWorkout,
 );
 
+router.post(
+  "/:workoutId/exercises",
+  requireAuth,
+  authRole("ATHLETE"),
+  validateRequest(WorkoutValidations.addExerciseZodSchema),
+  WorkoutController.addExerciseToLiveWorkout,
+);
+
 // Log a set for a specific workout exercise (ATHLETE only)
 router.post(
   "/exercises/:workoutExerciseId/sets",
