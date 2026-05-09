@@ -1,0 +1,19 @@
+model Biometrics {
+  id               String   @id @default(uuid())
+  athleteId        String
+  athlete          User     @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  date             DateTime @default(now())
+  weight           Float? // Body weight in kg or lbs
+  sleepQuality     Int? // 1-10 score for AI ingestion
+  sleepHours       Float?
+  restingHeartRate Int? // bpm
+  subjectiveStress Int? // 1-10 stress scale score
+  fatigueScore     Float? // Retained for AI generated analysis score
+  notes            String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([athleteId])
+}

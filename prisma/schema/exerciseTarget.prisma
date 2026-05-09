@@ -1,0 +1,19 @@
+model ExerciseTarget {
+  id           String     @id @default(uuid())
+  programDayId String
+  programDay   ProgramDay @relation(fields: [programDayId], references: [id], onDelete: Cascade)
+
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
+
+  targetSets Int
+  targetReps String // String allows for values like "8-10", "Failure", or "5"
+  order      Int // Keeps the exercises sequenced correctly for the day
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([programDayId])
+  @@index([exerciseId])
+}

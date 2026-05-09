@@ -1,0 +1,13 @@
+model ProgramDay {
+  id        String  @id @default(uuid())
+  programId String
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  dayNumber Int // e.g., 1, 2, 3 representing Day 1, Day 2, etc.
+
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  ExerciseTarget ExerciseTarget[]
+
+  @@index([programId])
+}

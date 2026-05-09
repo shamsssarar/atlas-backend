@@ -1,0 +1,13 @@
+model Workout {
+  id               String            @id @default(uuid())
+  athleteId        String
+  athlete          User              @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  date             DateTime
+  focus            String // e.g., "Hypertrophy/Density", "Strength"
+  notes            String?
+  workoutExercises WorkoutExercise[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}

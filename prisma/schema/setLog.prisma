@@ -1,0 +1,17 @@
+model SetLog {
+  id                String          @id @default(uuid())
+  workoutExerciseId String
+  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  setNumber         Int
+  weight            Float // Stored in kg or lbs 
+  reps              Int
+  rpe               Float? // Rate of Perceived Exertion (e.g., 1-10 scale)
+  isWarmup          Boolean         @default(false)
+  notes             String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([workoutExerciseId])
+}

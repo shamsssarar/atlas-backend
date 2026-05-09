@@ -1,0 +1,14 @@
+model Exercise {
+  id               String            @id @default(uuid())
+  name             String            @unique // e.g., "Barbell Back Squat"
+  targetMuscle     String // e.g., "Quadriceps"
+  biomechanicsType String? // e.g., "Compound", "Isolation"
+  description      String?
+  videoUrl         String?
+  workoutExercises WorkoutExercise[]
+  exerciseTargets  ExerciseTarget[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
