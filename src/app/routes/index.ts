@@ -6,6 +6,7 @@ import path from "path";
 import { ProgramDayRoutes } from "../modules/programDay/programDay.route";
 import { ExerciseRoutes } from "../modules/exercise/exercise.route";
 import { BiometricsRoutes } from "../modules/biometrics/biometrics.route";
+import { AIInsightRoutes } from "../modules/aiInsight/aiInsight.route";
 
 const router = express.Router();
 
@@ -34,6 +35,10 @@ const moduleRoutes = [
   {
     path: "/biometrics",
     route: BiometricsRoutes,
+  },
+  {
+    path: "/aiInsights",
+    route: AIInsightRoutes,
   },
 ];
 
