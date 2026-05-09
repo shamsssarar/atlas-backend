@@ -50,8 +50,19 @@ const logSetZodSchema = z.object({
   }),
 });
 
+const updateSetLogZodSchema = z.object({
+  body: z.object({
+    weight: z.number().nonnegative("Weight cannot be negative").optional(),
+    reps: z.number().int().nonnegative("Reps cannot be negative").optional(),
+    rpe: z.number().min(1, "RPE must be at least 1").max(10, "RPE cannot exceed 10").optional(),
+    isWarmup: z.boolean().optional(),
+    notes: z.string().max(500, "Notes cannot exceed 500 characters").optional(),
+  }),
+});
+
 export const WorkoutValidations = {
   startWorkoutZodSchema,
   logSetZodSchema,
   addExerciseZodSchema,
+  updateSetLogZodSchema,
 };

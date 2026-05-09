@@ -84,9 +84,50 @@ const addExerciseTargetToDay = catchAsync(
   },
 );
 
+const updateExerciseTarget = catchAsync(async (req: Request, res: Response) => {
+  if (!req.user || !req.user.uid) {
+    throw new AppError(401, "Unauthorized");
+  }
+
+  const { targetId } = req.params;
+  const result = await ProgramDayService.updateExerciseTarget(
+    targetId as string,
+    req.user.uid,
+    req.body,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Exercise target updated successfully!",
+    data: result,
+  });
+});
+
+const deleteExerciseTarget = catchAsync(async (req: Request, res: Response) => {
+  if (!req.user || !req.user.uid) {
+    throw new AppError(401, "Unauthorized");
+  }
+
+  const { targetId } = req.params;
+  const result = await ProgramDayService.deleteExerciseTarget(
+    targetId as string,
+    req.user.uid,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Exercise target deleted successfully!",
+    data: result,
+  });
+});
+
 export const ProgramDayController = {
   createProgramDay,
   updateProgramDay,
   deleteProgramDay,
   addExerciseTargetToDay,
+  updateExerciseTarget,
+  deleteExerciseTarget,
 };

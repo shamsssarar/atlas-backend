@@ -18,6 +18,12 @@ interface AddExerciseTargetPayload {
   order: number;
 }
 
+interface UpdateExerciseTargetPayload {
+  targetSets?: number;
+  targetReps?: string;
+  order?: number;
+}
+
 /**
  * HELPER: Verifies that the current coach owns the parent program.
  */
@@ -65,6 +71,37 @@ const verifyProgramOwnershipByDayId = async (
   }
 
   return programDay;
+};
+
+/**
+ * HELPER: Verifies ownership of a program based on the ExerciseTarget ID.
+ */
+const verifyProgramOwnershipByTargetId = async (
+  targetId: string,
+  coachId: string,
+) => {
+  const target = await prisma.exerciseTarget.findUnique({
+    where: { id: targetId },
+    include: { programDay: { include: { program: true } } },
+  });
+
+  if (!target || target.deletedAt) {
+    throw new AppError(404, "Exercise target not found");
+  }
+
+  if (!target.programDay || target.programDay.deletedAt) {
+    throw new AppError(404, "Parent ProgramDay not found");
+  }
+
+  if (!target.programDay.program || target.programDay.program.deletedAt) {
+    throw new AppError(404, "Parent Program not found");
+  }
+
+  if (target.programDay.program.coachId !== coachId) {
+    throw new AppError(403, "Forbidden: You do not own the parent program for this target");
+  }
+
+  return target;
 };
 
 const createProgramDay = async (
@@ -118,9 +155,36 @@ const addExerciseTargetToDay = async (
   });
 };
 
+const updateExerciseTarget = async (
+  targetId: string,
+  coachId: string,
+  payload: UpdateExerciseTargetPayload,
+): Promise<ExerciseTarget> => {
+  await verifyProgramOwnershipByTargetId(targetId, coachId);
+
+  return await prisma.exerciseTarget.update({
+    where: { id: targetId },
+    data: payload,
+  });
+};
+
+const deleteExerciseTarget = async (
+  targetId: string,
+  coachId: string,
+): Promise<ExerciseTarget> => {
+  await verifyProgramOwnershipByTargetId(targetId, coachId);
+
+  return await prisma.exerciseTarget.update({
+    where: { id: targetId },
+    data: { deletedAt: new Date() },
+  });
+};
+
 export const ProgramDayService = {
   createProgramDay,
   updateProgramDay,
   deleteProgramDay,
   addExerciseTargetToDay,
+  updateExerciseTarget,
+  deleteExerciseTarget,
 };

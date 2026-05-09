@@ -41,4 +41,29 @@ router.get(
   WorkoutController.getWorkoutSummary,
 );
 
+// Remove a workout exercise
+router.delete(
+  "/exercises/:workoutExerciseId",
+  requireAuth,
+  authRole("ATHLETE"),
+  WorkoutController.deleteWorkoutExercise,
+);
+
+// Update a set log
+router.patch(
+  "/sets/:setId",
+  requireAuth,
+  authRole("ATHLETE"),
+  validateRequest(WorkoutValidations.updateSetLogZodSchema),
+  WorkoutController.updateSetLog,
+);
+
+// Remove a set log
+router.delete(
+  "/sets/:setId",
+  requireAuth,
+  authRole("ATHLETE"),
+  WorkoutController.deleteSetLog,
+);
+
 export const WorkoutRoutes = router;

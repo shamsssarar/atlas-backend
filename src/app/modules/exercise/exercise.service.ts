@@ -17,8 +17,9 @@ const createExercise = async (
   role: string,
   payload: CreateExercisePayload,
 ): Promise<Exercise> => {
-  const existing = await prisma.exercise.findUnique({
-    where: { name: payload.name },
+  const coachId = role === "ADMIN" ? null : userId;
+  const existing = await prisma.exercise.findFirst({
+    where: { name: payload.name, coachId: coachId },
   });
 
   if (existing) {
@@ -26,7 +27,6 @@ const createExercise = async (
   }
 
   // ADMIN creates globally (null), COACH creates custom to their roster
-  const coachId = role === "ADMIN" ? null : userId;
 
   return await prisma.exercise.create({
     data: {

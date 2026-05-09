@@ -42,4 +42,21 @@ router.post(
   ProgramDayController.addExerciseTargetToDay,
 );
 
+// Update a specific exercise target (COACH only)
+router.patch(
+  "/targets/:targetId",
+  requireAuth,
+  authRole("COACH"),
+  validateRequest(ProgramDayValidation.updateExerciseTargetZodSchema),
+  ProgramDayController.updateExerciseTarget,
+);
+
+// Soft delete a specific exercise target (COACH only)
+router.delete(
+  "/targets/:targetId",
+  requireAuth,
+  authRole("COACH"),
+  ProgramDayController.deleteExerciseTarget,
+);
+
 export const ProgramDayRoutes = router;

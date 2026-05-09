@@ -41,8 +41,17 @@ const addExerciseTargetZodSchema = z.object({
   }),
 });
 
+const updateExerciseTargetZodSchema = z.object({
+  body: z.object({
+    targetSets: z.number().int().positive().optional(),
+    targetReps: z.string().min(1).optional(),
+    order: z.number().int().nonnegative().optional(),
+  }),
+});
+
 export const ProgramDayValidation = {
   createProgramDayZodSchema,
   updateProgramDayZodSchema,
   addExerciseTargetZodSchema,
+  updateExerciseTargetZodSchema,
 };

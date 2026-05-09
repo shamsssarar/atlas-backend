@@ -21,6 +21,14 @@ interface AddExercisePayload {
   order?: number;
 }
 
+interface UpdateSetLogPayload {
+  weight?: number;
+  reps?: number;
+  rpe?: number;
+  isWarmup?: boolean;
+  notes?: string;
+}
+
 const startWorkout = async (
   athleteId: string,
   payload: StartWorkoutPayload,
@@ -164,9 +172,90 @@ const addExerciseToLiveWorkout = async (
   });
 };
 
+const deleteWorkoutExercise = async (
+  workoutExerciseId: string,
+  athleteId: string,
+): Promise<any> => {
+  const workoutExercise = await prisma.workoutExercise.findUnique({
+    where: { id: workoutExerciseId },
+    include: { workout: true },
+  });
+
+  if (!workoutExercise || workoutExercise.deletedAt) {
+    throw new AppError(404, "Workout exercise not found");
+  }
+
+  if (workoutExercise.workout.athleteId !== athleteId) {
+    throw new AppError(403, "Forbidden: You do not own this workout");
+  }
+
+  return await prisma.workoutExercise.update({
+    where: { id: workoutExerciseId },
+    data: { deletedAt: new Date() },
+  });
+};
+
+const verifySetLogOwnership = async (setId: string, athleteId: string) => {
+  const setLog = await prisma.setLog.findUnique({
+    where: { id: setId },
+    include: { workoutExercise: { include: { workout: true } } },
+  });
+
+  if (!setLog || setLog.deletedAt) {
+    throw new AppError(404, "Set not found");
+  }
+
+  if (!setLog.workoutExercise || setLog.workoutExercise.deletedAt) {
+    throw new AppError(404, "Workout exercise not found");
+  }
+
+  if (
+    !setLog.workoutExercise.workout ||
+    setLog.workoutExercise.workout.deletedAt
+  ) {
+    throw new AppError(404, "Workout not found");
+  }
+
+  if (setLog.workoutExercise.workout.athleteId !== athleteId) {
+    throw new AppError(403, "Forbidden: You do not own this workout");
+  }
+
+  return setLog;
+};
+
+const updateSetLog = async (
+  setId: string,
+  athleteId: string,
+  payload: UpdateSetLogPayload,
+): Promise<SetLog> => {
+  await verifySetLogOwnership(setId, athleteId);
+
+  return await prisma.setLog.update({
+    where: { id: setId },
+    data: payload,
+  });
+};
+
+const deleteSetLog = async (
+  setId: string,
+  athleteId: string,
+): Promise<SetLog> => {
+  await verifySetLogOwnership(setId, athleteId);
+
+  // Hard deletion is also an option here for transient sets,
+  // but adhering to the SOP soft-delete pattern ensures integrity
+  return await prisma.setLog.update({
+    where: { id: setId },
+    data: { deletedAt: new Date() },
+  });
+};
+
 export const WorkoutService = {
   startWorkout,
   logSet,
   getWorkoutSummary,
   addExerciseToLiveWorkout,
+  deleteWorkoutExercise,
+  updateSetLog,
+  deleteSetLog,
 };
