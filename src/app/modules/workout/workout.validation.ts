@@ -13,7 +13,10 @@ const startWorkoutZodSchema = z.object({
 
 const addExerciseZodSchema = z.object({
   body: z.object({
-    exerciseId: z.string().uuid("Invalid Exercise ID"),
+    exerciseId: z.string().uuid("Invalid Exercise ID").optional(),
+    exerciseName: z.string({
+      required_error: "Exercise name is required",
+    }),
     order: z.number().int().nonnegative().optional(), // Optional!
   }),
 });

@@ -5,7 +5,7 @@ import { AppError } from "../../errorHelpers/AppError";
 
 // Initialize the Google Generative AI client (per your instructions using process.env)
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
-const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
 export interface AddDocumentChunkPayload {
   chunkKey: string;
@@ -24,7 +24,7 @@ export interface SimilaritySearchResult {
 const generateEmbedding = async (text: string): Promise<number[]> => {
   try {
     const result = await model.embedContent(text);
-    return result.embedding.values;
+    return result.embedding.values.slice(0, 768);
   } catch (error: any) {
     throw new AppError(
       500,

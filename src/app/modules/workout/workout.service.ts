@@ -17,7 +17,8 @@ interface LogSetPayload {
 }
 
 interface AddExercisePayload {
-  exerciseId: string;
+  exerciseId?: string;
+  exerciseName: string;
   order?: number;
 }
 
@@ -147,13 +148,36 @@ const addExerciseToLiveWorkout = async (
     throw new AppError(403, "Forbidden: You do not own this workout");
   }
 
-  // 2. Verify the requested Exercise actually exists in the global dictionary
-  const exercise = await prisma.exercise.findUnique({
-    where: { id: payload.exerciseId },
-  });
+  // 2. Resolve Exercise ID
+  let resolvedExerciseId = payload.exerciseId;
 
-  if (!exercise || exercise.deletedAt) {
-    throw new AppError(404, "Exercise not found");
+  if (!resolvedExerciseId) {
+    // Lookup by name
+    let exercise = await prisma.exercise.findFirst({
+      where: { name: { equals: payload.exerciseName, mode: "insensitive" } },
+    });
+
+    if (!exercise) {
+      exercise = await prisma.exercise.create({
+        data: {
+          name: payload.exerciseName,
+          targetMuscle: "AI_GENERATED",
+          muscleGroup: "OTHER",
+          equipment: "OTHER",
+        },
+      });
+    }
+    
+    resolvedExerciseId = exercise.id;
+  } else {
+    // Verify the requested Exercise actually exists in the global dictionary
+    const exercise = await prisma.exercise.findUnique({
+      where: { id: resolvedExerciseId },
+    });
+
+    if (!exercise || exercise.deletedAt) {
+      throw new AppError(404, "Exercise not found");
+    }
   }
 
   // 3. Pro-Move: Auto-calculate the order if the frontend didn't provide it
@@ -163,7 +187,7 @@ const addExerciseToLiveWorkout = async (
   return await prisma.workoutExercise.create({
     data: {
       workoutId,
-      exerciseId: payload.exerciseId,
+      exerciseId: resolvedExerciseId,
       order: nextOrder,
     },
     include: {
