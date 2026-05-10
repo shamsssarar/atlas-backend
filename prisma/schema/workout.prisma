@@ -1,10 +1,11 @@
 model Workout {
-  id        String   @id @default(uuid())
-  athleteId String
-  athlete   User     @relation(fields: [athleteId], references: [id], onDelete: Cascade)
-  date      DateTime
-  focus     String // e.g., "Hypertrophy/Density", "Strength"
-  notes     String?
+  id          String   @id @default(uuid())
+  athleteId   String
+  athlete     User     @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  date        DateTime
+  focus       String // e.g., "Hypertrophy/Density", "Strength"
+  notes       String?
+  isCompleted Boolean  @default(false)
 
   programDayId     String?
   programDay       ProgramDay?       @relation(fields: [programDayId], references: [id], onDelete: SetNull)

@@ -8,5 +8,6 @@ const router = express.Router();
 router.use(requireAuth, authRole("ATHLETE"));
 
 router.post("/generate-fatigue", AIInsightController.generateFatigueInsight);
+router.post("/generate-workout", AIInsightController.generateNextWorkout);
 
 export const AIInsightRoutes = router;
