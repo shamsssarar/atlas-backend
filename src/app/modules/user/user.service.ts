@@ -1,9 +1,9 @@
 import { User, Role } from "@prisma/client";
 import prisma from "../../../shared/prisma";
 
+// Define or update your interface so TypeScript knows 'name' is coming from the frontend
 interface ProfileData {
-  firstName: string;
-  lastName: string;
+  name?: string;
   role?: Role;
   bio?: string;
   avatarUrl?: string;
@@ -14,6 +14,7 @@ const syncUserToPrisma = async (
   email: string,
   profileData: ProfileData,
 ) => {
+  // 1. Idempotency Check: Does the user already exist?
   const existingUser = await prisma.user.findUnique({
     where: { id: uid },
     include: { profile: true },
@@ -23,6 +24,14 @@ const syncUserToPrisma = async (
     return { isNew: false, user: existingUser };
   }
 
+  // 2. The Data Transformer: Split the single "name" into first and last
+  const nameParts = profileData.name
+    ? profileData.name.trim().split(" ")
+    : ["Unknown"];
+  const firstName = nameParts[0];
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+  // 3. Database Transaction
   const newUser = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
@@ -35,8 +44,8 @@ const syncUserToPrisma = async (
     await tx.profile.create({
       data: {
         userId: uid,
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
+        firstName: firstName as string, // Use the extracted variable
+        lastName: lastName, // Use the extracted variable
         bio: profileData.bio ?? null,
         avatarUrl: profileData.avatarUrl ?? null,
       },

@@ -64,6 +64,38 @@ const getAllProgramsForAdmin = async (page: number = 1, limit: number = 20) => {
   };
 };
 
+const getAllPublicPrograms = async (page: number = 1, limit: number = 20) => {
+  const skip = (page - 1) * limit;
+
+  const [data, total] = await Promise.all([
+    prisma.program.findMany({
+      where: { deletedAt: null },
+      include: {
+        coach: {
+          select: {
+            id: true,
+            profile: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.program.count({ where: { deletedAt: null } }),
+  ]);
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+    data,
+  };
+};
+
 const getProgramById = async (id: string): Promise<Program> => {
   const program = await prisma.program.findUnique({
     where: { id },
@@ -120,6 +152,7 @@ export const ProgramService = {
   createProgram,
   getCoachPrograms,
   getAllProgramsForAdmin,
+  getAllPublicPrograms,
   getProgramById,
   updateProgram,
   deleteProgram,

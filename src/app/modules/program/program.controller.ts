@@ -52,6 +52,21 @@ const getAllProgramsForAdmin = catchAsync(
   },
 );
 
+const getAllPublicPrograms = catchAsync(async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 20;
+
+  const result = await ProgramService.getAllPublicPrograms(page, limit);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Public programs retrieved successfully!",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 const getProgramById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await ProgramService.getProgramById(id as string);
@@ -114,6 +129,7 @@ export const ProgramController = {
   createProgram,
   getCoachPrograms,
   getAllProgramsForAdmin,
+  getAllPublicPrograms,
   getProgramById,
   updateProgram,
   deleteProgram,

@@ -32,8 +32,11 @@ router.get(
   ProgramController.getAllProgramsForAdmin,
 );
 
+// Get all programs globally (Public)
+router.get("/public", ProgramController.getAllPublicPrograms);
+
 // Get a specific program by ID (Authenticated)
-router.get("/:id", requireAuth, ProgramController.getProgramById);
+router.get("/:id", ProgramController.getProgramById);
 
 // Update a specific program (COACH only, ownership verified in service)
 router.patch(

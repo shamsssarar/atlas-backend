@@ -4,6 +4,7 @@
   "description": "Atlas Performance Hub API",
   "main": "dist/index.js",
   "scripts": {
+    "postinstall": "prisma generate",
     "start": "node dist/server.js",
     "build": "prisma generate && tsc",
     "vercel-build": "prisma generate && tsc",

@@ -11,11 +11,12 @@ const syncUser = catchAsync(async (req: Request, res: Response) => {
   }
 
   const { uid, email } = req.user;
-  const { firstName, lastName, role, bio, avatarUrl } = req.body;
+  const { firstName, lastName, role, bio, avatarUrl, name } = req.body;
+
+  const fullName = name || [firstName, lastName].filter(Boolean).join(" ");
 
   const result = await UserService.syncUserToPrisma(uid, email || "", {
-    firstName,
-    lastName,
+    name: fullName,
     role,
     bio,
     avatarUrl,
